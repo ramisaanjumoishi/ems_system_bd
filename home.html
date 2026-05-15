@@ -1,0 +1,1250 @@
+<?php
+/* =========================================
+   Bangladesh Election Commission EMS
+   Homepage Prototype
+   Single File PHP + HTML + CSS + JS
+   ========================================= */
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bangladesh Election Commission — EMS</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+
+    <style>
+
+        :root{
+            --ec-blue:#0d47a1;
+            --ec-blue2:#1565c0;
+            --ec-light:#f5f8ff;
+            --ec-border:#dbe5f3;
+            --ec-green:#198754;
+            --ec-red:#dc3545;
+            --ec-dark:#0b2d6b;
+        }
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+        }
+
+        body{
+            font-family:'Segoe UI',sans-serif;
+            background:#f4f7fb;
+            color:#1b1b1b;
+        }
+
+        a{
+            text-decoration:none;
+        }
+
+        /* =======================
+           TOP HEADER
+        ======================== */
+
+        .top-header{
+            background:var(--ec-dark);
+            color:white;
+            padding:10px 0;
+        }
+
+        .brand-wrap{
+            display:flex;
+            align-items:center;
+            gap:12px;
+        }
+
+        .logo-circle{
+            width:48px;
+            height:48px;
+            background:white;
+            border-radius:50%;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            color:var(--ec-blue);
+            font-size:22px;
+        }
+
+        .gov-title{
+            font-size:11px;
+            opacity:.8;
+            text-transform:uppercase;
+        }
+
+        .brand-title{
+            font-size:17px;
+            font-weight:700;
+        }
+
+        .brand-sub{
+            font-size:12px;
+            opacity:.8;
+        }
+
+        .top-actions{
+            display:flex;
+            align-items:center;
+            gap:10px;
+        }
+
+        .top-badge{
+            background:rgba(255,255,255,.15);
+            border:1px solid rgba(255,255,255,.2);
+            color:white;
+            padding:6px 14px;
+            border-radius:50px;
+            font-size:12px;
+            font-weight:600;
+        }
+
+        .login-btn{
+            background:white;
+            color:var(--ec-blue);
+            border:none;
+            padding:8px 16px;
+            border-radius:8px;
+            font-size:13px;
+            font-weight:600;
+        }
+
+        /* =======================
+           NAVBAR
+        ======================== */
+
+        .main-navbar{
+            background:white;
+            border-bottom:1px solid #e4e8ef;
+        }
+
+        .nav-link{
+            color:#444 !important;
+            font-weight:500;
+            padding:14px 18px !important;
+        }
+
+        .nav-link.active{
+            color:var(--ec-blue) !important;
+            font-weight:700;
+        }
+
+        /* =======================
+           HERO SECTION
+        ======================== */
+
+        .hero{
+            padding:70px 0;
+            background:linear-gradient(to bottom,#ffffff,#f6f9ff);
+        }
+
+        .hero-badge{
+            display:inline-block;
+            background:#e9f1ff;
+            color:var(--ec-blue);
+            padding:7px 14px;
+            border-radius:50px;
+            font-size:12px;
+            font-weight:600;
+            margin-bottom:18px;
+        }
+
+        .hero h1{
+            font-size:56px;
+            font-weight:800;
+            line-height:1.1;
+            margin-bottom:20px;
+        }
+
+        .hero h1 span{
+            color:var(--ec-blue);
+        }
+
+        .hero p{
+            color:#5d6572;
+            font-size:18px;
+            max-width:560px;
+            line-height:1.7;
+        }
+
+        .hero-buttons{
+            margin-top:30px;
+            display:flex;
+            gap:15px;
+        }
+
+        .btn-main{
+            background:var(--ec-blue);
+            color:white;
+            padding:14px 24px;
+            border-radius:10px;
+            font-weight:600;
+            border:none;
+        }
+
+        .btn-outline-main{
+            border:2px solid var(--ec-blue);
+            color:var(--ec-blue);
+            padding:12px 22px;
+            border-radius:10px;
+            background:white;
+            font-weight:600;
+        }
+
+        .hero-image-card{
+            background:white;
+            border-radius:22px;
+            padding:30px;
+            box-shadow:0 10px 30px rgba(0,0,0,.08);
+        }
+
+        .hero-image-card img{
+            width:100%;
+            border-radius:16px;
+        }
+
+        /* =======================
+           SEARCH SECTION
+        ======================== */
+
+        .search-section{
+            padding:30px 0 60px;
+        }
+
+        .search-card{
+            background:white;
+            border-radius:18px;
+            padding:28px;
+            box-shadow:0 6px 20px rgba(0,0,0,.06);
+            border:1px solid #ebeff6;
+            height:100%;
+        }
+
+        .search-title{
+            display:flex;
+            align-items:center;
+            gap:10px;
+            margin-bottom:18px;
+        }
+
+        .search-title i{
+            width:42px;
+            height:42px;
+            background:#eaf2ff;
+            color:var(--ec-blue);
+            border-radius:10px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+        }
+
+        .search-title h5{
+            margin:0;
+            font-weight:700;
+        }
+
+        .search-title p{
+            margin:0;
+            color:#777;
+            font-size:13px;
+        }
+
+        .form-label{
+            font-size:13px;
+            font-weight:600;
+            margin-bottom:7px;
+        }
+
+        .form-control{
+            border-radius:10px;
+            padding:12px;
+            border:1px solid #d9e2f0;
+        }
+
+        .btn-search{
+            background:var(--ec-blue);
+            color:white;
+            border:none;
+            padding:12px;
+            border-radius:10px;
+            width:100%;
+            font-weight:600;
+        }
+
+        .btn-clear{
+            background:white;
+            border:1px solid #cfd7e4;
+            padding:12px;
+            border-radius:10px;
+            width:100%;
+        }
+
+        .helper-text{
+            margin-top:12px;
+            color:#888;
+            font-size:12px;
+        }
+
+        /* =======================
+           RESULT CARD
+        ======================== */
+
+        .result-card{
+            background:white;
+            border-radius:18px;
+            box-shadow:0 6px 20px rgba(0,0,0,.06);
+            border:1px solid #ebeff6;
+            overflow:hidden;
+            min-height:100%;
+        }
+
+        .empty-state{
+            padding:70px 30px;
+            text-align:center;
+            color:#97a2b5;
+        }
+
+        .empty-state i{
+            font-size:70px;
+            margin-bottom:18px;
+            color:#c8d6f1;
+        }
+
+        .voter-header{
+            background:linear-gradient(135deg,var(--ec-blue),var(--ec-blue2));
+            color:white;
+            padding:24px;
+            display:none;
+            align-items:center;
+            justify-content:space-between;
+        }
+
+        .eligible-badge{
+            background:#d1ffe4;
+            color:#0b8f4d;
+            padding:6px 14px;
+            border-radius:50px;
+            font-size:12px;
+            font-weight:700;
+        }
+
+        .voter-body{
+            padding:24px;
+            display:none;
+        }
+
+        .info-box{
+            background:#f8fbff;
+            border:1px solid #e3ebf7;
+            border-radius:12px;
+            padding:14px;
+            margin-bottom:14px;
+        }
+
+        .info-label{
+            font-size:11px;
+            color:#777;
+            text-transform:uppercase;
+            margin-bottom:5px;
+        }
+
+        .info-value{
+            font-size:14px;
+            font-weight:600;
+        }
+
+        .schedule{
+            background:#edf4ff;
+            border-left:4px solid var(--ec-blue);
+            padding:14px;
+            border-radius:8px;
+            margin-top:14px;
+            font-size:14px;
+            color:var(--ec-blue);
+            font-weight:600;
+        }
+
+        /* =======================
+           DASHBOARD STATS
+        ======================== */
+
+        .stats-section{
+            padding:50px 0;
+        }
+
+        .stats-card{
+            background:white;
+            border-radius:16px;
+            padding:24px;
+            box-shadow:0 4px 14px rgba(0,0,0,.05);
+            border:1px solid #e8edf7;
+            transition:.3s;
+            height:100%;
+        }
+
+        .stats-card:hover{
+            transform:translateY(-4px);
+        }
+
+        .stats-icon{
+            width:54px;
+            height:54px;
+            background:#edf3ff;
+            color:var(--ec-blue);
+            border-radius:14px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:22px;
+            margin-bottom:14px;
+        }
+
+        .stats-number{
+            font-size:32px;
+            font-weight:800;
+        }
+
+        .stats-label{
+            color:#666;
+        }
+
+        /* =======================
+           FEATURES
+        ======================== */
+
+        .features{
+            padding:70px 0;
+            background:white;
+        }
+
+        .section-title{
+            text-align:center;
+            margin-bottom:14px;
+            font-weight:800;
+            font-size:38px;
+        }
+
+        .section-sub{
+            text-align:center;
+            color:#666;
+            margin-bottom:50px;
+        }
+
+        .feature-card{
+            background:#f8fbff;
+            border:1px solid #e3ebf7;
+            border-radius:18px;
+            padding:30px;
+            text-align:center;
+            transition:.3s;
+            height:100%;
+        }
+
+        .feature-card:hover{
+            transform:translateY(-6px);
+            box-shadow:0 10px 20px rgba(0,0,0,.07);
+        }
+
+        .feature-icon{
+            width:70px;
+            height:70px;
+            border-radius:18px;
+            background:var(--ec-blue);
+            color:white;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:28px;
+            margin:auto;
+            margin-bottom:18px;
+        }
+
+        /* =======================
+           RESULTS TABLE
+        ======================== */
+
+        .results-section{
+            padding:70px 0;
+        }
+
+        .results-card{
+            background:white;
+            border-radius:18px;
+            overflow:hidden;
+            border:1px solid #e7edf7;
+            box-shadow:0 6px 20px rgba(0,0,0,.05);
+        }
+
+        .results-header{
+            padding:24px;
+            border-bottom:1px solid #edf1f7;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+        }
+
+        .live-badge{
+            background:#ffe9e9;
+            color:#d92323;
+            padding:6px 14px;
+            border-radius:50px;
+            font-size:12px;
+            font-weight:700;
+        }
+
+        .table thead{
+            background:#f7faff;
+        }
+
+        .status-pill{
+            background:#edf4ff;
+            color:var(--ec-blue);
+            padding:5px 10px;
+            border-radius:50px;
+            font-size:11px;
+            font-weight:700;
+        }
+
+        /* =======================
+           FOOTER
+        ======================== */
+
+        footer{
+            background:var(--ec-dark);
+            color:white;
+            padding:40px 0;
+            margin-top:50px;
+        }
+
+        footer h5{
+            font-weight:700;
+            margin-bottom:15px;
+        }
+
+        footer p,
+        footer a{
+            color:rgba(255,255,255,.8);
+            font-size:14px;
+        }
+
+        footer a:hover{
+            color:white;
+        }
+
+        .copyright{
+            border-top:1px solid rgba(255,255,255,.15);
+            margin-top:25px;
+            padding-top:20px;
+            text-align:center;
+            font-size:13px;
+        }
+
+        @media(max-width:991px){
+
+            .hero h1{
+                font-size:40px;
+            }
+
+            .hero{
+                text-align:center;
+            }
+
+            .hero-buttons{
+                justify-content:center;
+            }
+
+            .hero-image-card{
+                margin-top:40px;
+            }
+
+        }
+
+    </style>
+</head>
+
+<body>
+
+<!-- =========================
+     TOP HEADER
+========================= -->
+
+<div class="top-header">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center flex-wrap">
+
+            <div class="brand-wrap">
+                <div class="logo-circle">
+                    <i class="fa-solid fa-landmark"></i>
+                </div>
+
+                <div>
+                    <div class="gov-title">
+                        Government of the People's Republic of Bangladesh
+                    </div>
+
+                    <div class="brand-title">
+                        Bangladesh Election Commission
+                    </div>
+
+                    <div class="brand-sub">
+                        Election Management System (EMS)
+                    </div>
+                </div>
+            </div>
+
+            <div class="top-actions mt-3 mt-lg-0">
+                <div class="top-badge">
+                    General Election 2026
+                </div>
+
+                <div class="top-badge">
+                    Public Portal
+                </div>
+
+                <button class="login-btn">
+                    <i class="fa-solid fa-lock me-2"></i>
+                    Officer Login
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- =========================
+     NAVBAR
+========================= -->
+
+<nav class="navbar navbar-expand-lg main-navbar">
+    <div class="container">
+
+        <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navMenu">
+
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#">Home</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Find Polling Station</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Election Results</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Election Guidelines</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="#">About EMS</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Help</a>
+                </li>
+            </ul>
+
+        </div>
+
+    </div>
+</nav>
+
+<!-- =========================
+     HERO SECTION
+========================= -->
+
+<section class="hero">
+
+    <div class="container">
+
+        <div class="row align-items-center">
+
+            <div class="col-lg-6">
+
+                <div class="hero-badge">
+                    Official National Platform
+                </div>
+
+                <h1>
+                    National Election
+                    <span>Management System</span>
+                </h1>
+
+                <p>
+                    Secure voter services, polling management,
+                    and election result monitoring platform for
+                    citizens of Bangladesh.
+                </p>
+
+                <div class="hero-buttons">
+
+                    <button class="btn-main">
+                        <i class="fa-solid fa-location-dot me-2"></i>
+                        Find Your Polling Station
+                    </button>
+
+                    <button class="btn-outline-main">
+                        <i class="fa-solid fa-chart-column me-2"></i>
+                        View Election Results
+                    </button>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-6">
+
+                <div class="hero-image-card">
+
+                    <img src="https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?q=80&w=1200&auto=format&fit=crop"
+                         alt="Election">
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- =========================
+     SEARCH SECTION
+========================= -->
+
+<section class="search-section">
+
+    <div class="container">
+
+        <div class="row g-4">
+
+            <!-- LEFT SEARCH CARD -->
+
+            <div class="col-lg-5">
+
+                <div class="search-card">
+
+                    <div class="search-title">
+
+                        <i class="fa-solid fa-magnifying-glass"></i>
+
+                        <div>
+                            <h5>Find Polling Station</h5>
+                            <p>Search using Voter ID or National ID</p>
+                        </div>
+
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Voter ID
+                        </label>
+
+                        <input type="text"
+                               class="form-control"
+                               id="voterId"
+                               placeholder="Enter Voter ID">
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">
+                            National ID (NID)
+                        </label>
+
+                        <input type="text"
+                               class="form-control"
+                               id="nid"
+                               placeholder="Enter National ID">
+                    </div>
+
+                    <div class="row g-3">
+
+                        <div class="col-6">
+                            <button class="btn-search" onclick="searchVoter()">
+                                Search Database
+                            </button>
+                        </div>
+
+                        <div class="col-6">
+                            <button class="btn-clear" onclick="clearSearch()">
+                                Clear
+                            </button>
+                        </div>
+
+                    </div>
+
+                    <div class="helper-text">
+                        Please ensure your information matches your official voter registration record.
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- RIGHT RESULT CARD -->
+
+            <div class="col-lg-7">
+
+                <div class="result-card">
+
+                    <div class="empty-state" id="emptyState">
+
+                        <i class="fa-solid fa-id-card"></i>
+
+                        <h5>
+                            Search for a voter
+                        </h5>
+
+                        <p>
+                            Search for a voter to view polling station assignment,
+                            constituency information, and voting eligibility status.
+                        </p>
+
+                    </div>
+
+                    <div class="voter-header" id="voterHeader">
+
+                        <div>
+                            <h5 class="mb-1">
+                                Md. Ariful Islam
+                            </h5>
+
+                            <small>
+                                Voter ID: VTR-2026-00412
+                            </small>
+                        </div>
+
+                        <div class="eligible-badge">
+                            Eligible to Vote
+                        </div>
+
+                    </div>
+
+                    <div class="voter-body" id="voterBody">
+
+                        <div class="row">
+
+                            <div class="col-md-6">
+                                <div class="info-box">
+                                    <div class="info-label">
+                                        Constituency
+                                    </div>
+
+                                    <div class="info-value">
+                                        Dhaka-10
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="info-box">
+                                    <div class="info-label">
+                                        Polling Booth
+                                    </div>
+
+                                    <div class="info-value">
+                                        Booth 03 — Floor 1
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="info-box">
+                                    <div class="info-label">
+                                        Polling Center
+                                    </div>
+
+                                    <div class="info-value">
+                                        Mirpur Govt High School
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="info-box">
+                                    <div class="info-label">
+                                        Date of Election
+                                    </div>
+
+                                    <div class="info-value">
+                                        15 April 2026
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="schedule">
+                            <i class="fa-solid fa-calendar-days me-2"></i>
+                            Voting Schedule:
+                            Jan 15, 2026 — 08:00 AM to 04:00 PM
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- =========================
+     STATS SECTION
+========================= -->
+
+<section class="stats-section">
+
+    <div class="container">
+
+        <div class="row g-4">
+
+            <div class="col-lg col-md-4 col-6">
+                <div class="stats-card">
+                    <div class="stats-icon">
+                        <i class="fa-solid fa-location-dot"></i>
+                    </div>
+
+                    <div class="stats-number">300</div>
+                    <div class="stats-label">Constituencies</div>
+                </div>
+            </div>
+
+            <div class="col-lg col-md-4 col-6">
+                <div class="stats-card">
+                    <div class="stats-icon">
+                        <i class="fa-solid fa-building"></i>
+                    </div>
+
+                    <div class="stats-number">42,150</div>
+                    <div class="stats-label">Polling Stations</div>
+                </div>
+            </div>
+
+            <div class="col-lg col-md-4 col-6">
+                <div class="stats-card">
+                    <div class="stats-icon">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+
+                    <div class="stats-number">119.2M</div>
+                    <div class="stats-label">Registered Voters</div>
+                </div>
+            </div>
+
+            <div class="col-lg col-md-4 col-6">
+                <div class="stats-card">
+                    <div class="stats-icon">
+                        <i class="fa-solid fa-chart-line"></i>
+                    </div>
+
+                    <div class="stats-number">76%</div>
+                    <div class="stats-label">Election Progress</div>
+                </div>
+            </div>
+
+            <div class="col-lg col-md-4 col-6">
+                <div class="stats-card">
+                    <div class="stats-icon">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+
+                    <div class="stats-number">220</div>
+                    <div class="stats-label">Results Published</div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- =========================
+     FEATURES
+========================= -->
+
+<section class="features">
+
+    <div class="container">
+
+        <h2 class="section-title">
+            Built for Integrity & Transparency
+        </h2>
+
+        <p class="section-sub">
+            Secure, scalable, and transparent election administration infrastructure.
+        </p>
+
+        <div class="row g-4">
+
+            <div class="col-lg-3 col-md-6">
+                <div class="feature-card">
+
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+
+                    <h5>Secure Role-Based Access</h5>
+
+                    <p>
+                        Tiered permissions for APO, PO, ARO, RO, and system administrators.
+                    </p>
+
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <div class="feature-card">
+
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+
+                    <h5>Result Validation</h5>
+
+                    <p>
+                        Automated checks for ballot consistency and polling station accuracy.
+                    </p>
+
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <div class="feature-card">
+
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-chart-pie"></i>
+                    </div>
+
+                    <h5>Result Aggregation</h5>
+
+                    <p>
+                        Constituency-level aggregation and centralized election reporting.
+                    </p>
+
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <div class="feature-card">
+
+                    <div class="feature-icon">
+                        <i class="fa-solid fa-wave-square"></i>
+                    </div>
+
+                    <h5>Live Monitoring</h5>
+
+                    <p>
+                        Real-time election monitoring dashboards and verification systems.
+                    </p>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- =========================
+     RESULTS SECTION
+========================= -->
+
+<section class="results-section">
+
+    <div class="container">
+
+        <div class="results-card">
+
+            <div class="results-header">
+
+                <div>
+                    <h4 class="mb-1">
+                        Live Election Results Preview
+                    </h4>
+
+                    <small class="text-muted">
+                        Preliminary constituency-level result summaries
+                    </small>
+                </div>
+
+                <div class="live-badge">
+                    LIVE RESULTS
+                </div>
+
+            </div>
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead>
+                        <tr>
+                            <th>Constituency</th>
+                            <th>Leading Candidate</th>
+                            <th>Party</th>
+                            <th>Status</th>
+                            <th>Turnout</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        <tr>
+                            <td>Dhaka-10</td>
+                            <td>Mohammad Rahman</td>
+                            <td>Awami League</td>
+                            <td>
+                                <span class="status-pill">
+                                    Preliminary
+                                </span>
+                            </td>
+                            <td>68.4%</td>
+                        </tr>
+
+                        <tr>
+                            <td>Sylhet-3</td>
+                            <td>Farhana Akter</td>
+                            <td>Independent</td>
+                            <td>
+                                <span class="status-pill">
+                                    Verified
+                                </span>
+                            </td>
+                            <td>73.1%</td>
+                        </tr>
+
+                        <tr>
+                            <td>Rajshahi-2</td>
+                            <td>Nasrin Sultan</td>
+                            <td>Workers Party</td>
+                            <td>
+                                <span class="status-pill">
+                                    Preliminary
+                                </span>
+                            </td>
+                            <td>62.5%</td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- =========================
+     FOOTER
+========================= -->
+
+<footer>
+
+    <div class="container">
+
+        <div class="row">
+
+            <div class="col-lg-4 mb-4">
+
+                <h5>
+                    Bangladesh Election Commission
+                </h5>
+
+                <p>
+                    Secure and transparent election administration platform
+                    for the People's Republic of Bangladesh.
+                </p>
+
+            </div>
+
+            <div class="col-lg-4 mb-4">
+
+                <h5>
+                    Election Helpdesk
+                </h5>
+
+                <p>
+                    Hotline: 105<br>
+                    support@ems.gov.bd
+                </p>
+
+            </div>
+
+            <div class="col-lg-4 mb-4">
+
+                <h5>
+                    Quick Links
+                </h5>
+
+                <p>
+                    <a href="#">Privacy Policy</a><br>
+                    <a href="#">Accessibility</a><br>
+                    <a href="#">Terms of Use</a>
+                </p>
+
+            </div>
+
+        </div>
+
+        <div class="copyright">
+            © 2026 Bangladesh Election Commission — Election Management System
+        </div>
+
+    </div>
+
+</footer>
+
+<!-- Bootstrap JS -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+
+    function searchVoter(){
+
+        document.getElementById("emptyState").style.display="none";
+
+        document.getElementById("voterHeader").style.display="flex";
+
+        document.getElementById("voterBody").style.display="block";
+    }
+
+    function clearSearch(){
+
+        document.getElementById("voterId").value="";
+        document.getElementById("nid").value="";
+
+        document.getElementById("emptyState").style.display="block";
+
+        document.getElementById("voterHeader").style.display="none";
+
+        document.getElementById("voterBody").style.display="none";
+    }
+
+</script>
+
+</body>
+</html>
