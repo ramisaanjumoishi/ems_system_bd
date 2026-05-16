@@ -571,7 +571,7 @@ button{cursor:pointer;font-family:var(--font-body);}
                 <div class="role-tag">System Administrator</div>
             </div>
         </div>
-        <button class="btn-logout" onclick="if(confirm('Logout from EMS?')){window.location='login.php'}">⏻ Logout</button>
+        <button class="btn-logout" onclick="if(confirm('Logout from EMS?')){window.location='../logout.php'}">⏻ Logout</button>
     </div>
 </nav>
 
