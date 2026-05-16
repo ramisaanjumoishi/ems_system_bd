@@ -118,39 +118,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'compi
     $totRow = $totStmt->fetch();
     $grand_total = (int)$totRow['grand_total'];
 
-    // Find winner: candidate with most votes across all booths in constituency
-    $winStmt = $pdo->prepare("
-        SELECT br.candidate_id, IFNULL(SUM(br.votes_received),0) as total_votes
-        FROM booth_results br
-        JOIN polling_booths pb ON pb.booth_id = br.booth_id
-        JOIN polling_stations ps ON ps.station_id = pb.station_id
-        WHERE ps.constituency_id = ? AND br.is_locked = 1
-        GROUP BY br.candidate_id
-        ORDER BY total_votes DESC
-        LIMIT 1
-    ");
-    $winStmt->execute([$constituency_id]);
-    $winRow = $winStmt->fetch();
-    $winner_id = $winRow ? (int)$winRow['candidate_id'] : null;
+    // Get ALL candidates with their totals, ordered by votes DESC
+$winStmt = $pdo->prepare("
+    SELECT br.candidate_id, IFNULL(SUM(br.votes_received),0) as total_votes
+    FROM booth_results br
+    JOIN polling_booths pb ON pb.booth_id = br.booth_id
+    JOIN polling_stations ps ON ps.station_id = pb.station_id
+    WHERE ps.constituency_id = ? AND br.is_locked = 1
+    GROUP BY br.candidate_id
+    ORDER BY total_votes DESC
+");
+$winStmt->execute([$constituency_id]);
+$allCandTotals = $winStmt->fetchAll();
+
+// Detect tie: check if top two candidates have equal votes
+$is_tie    = false;
+$winner_id = null;
+if (!empty($allCandTotals)) {
+    $top_votes = (int)$allCandTotals[0]['total_votes'];
+    $tied_candidates = array_filter($allCandTotals, fn($r) => (int)$r['total_votes'] === $top_votes);
+    if (count($tied_candidates) > 1) {
+        $is_tie    = true;
+        $winner_id = null;  // No winner when tie — requires RO adjudication
+    } else {
+        $winner_id = (int)$allCandTotals[0]['candidate_id'];
+    }
+}
 
     $pdo->beginTransaction();
     try {
         if ($existRow) {
             $upd = $pdo->prepare("
                 UPDATE constituency_results
-                SET total_votes_cast=?, winner_candidate_id=?, compiled_by_aro=?,
+                SET total_votes_cast=?, winner_candidate_id=?, is_tie=?, compiled_by_aro=?,
                     approved_by_ro=NULL, approval_timestamp=NULL, status='AGGREGATED'
                 WHERE constituency_id=?
             ");
-            $upd->execute([$grand_total, $winner_id, $logged_in_id, $constituency_id]);
+            // UPDATE branch
+$upd->execute([$grand_total, $winner_id, (int)$is_tie, $logged_in_id, $constituency_id]);
+
+
+
+
         } else {
             $ins = $pdo->prepare("
                 INSERT INTO constituency_results
-                (constituency_id, winner_candidate_id, total_votes_cast, compiled_by_aro,
+                (constituency_id, winner_candidate_id, is_tie, total_votes_cast,  compiled_by_aro,
                  approved_by_ro, approval_timestamp, status)
-                VALUES (?,?,?,?,NULL,NULL,'AGGREGATED')
+                VALUES (?,?,?,?,?,NULL,NULL,'AGGREGATED')
             ");
-            $ins->execute([$constituency_id, $winner_id, $grand_total, $logged_in_id]);
+            // INSERT branch  
+$ins->execute([$constituency_id, $winner_id, $grand_total, (int)$is_tie, $logged_in_id]);
         }
 
         // Update constituency status
@@ -167,7 +185,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'compi
             $_SERVER['REMOTE_ADDR']??'']);
 
         $pdo->commit();
-        echo json_encode(['success'=>true,'message'=>'Constituency result compiled successfully. Total votes: '.number_format($grand_total).'. Forwarded to Returning Officer for approval.']);
+        $msg = $is_tie
+    ? 'Result compiled. ⚠️ TIE DETECTED — two or more candidates have equal votes. Returning Officer must adjudicate before approval.'
+    : 'Constituency result compiled successfully. Total votes: '.number_format($grand_total).'. Forwarded to Returning Officer for approval.';
+echo json_encode(['success'=>true,'message'=>$msg,'is_tie'=>$is_tie]);
     } catch (Exception $e) {
         $pdo->rollBack();
         echo json_encode(['success'=>false,'message'=>'DB error: '.$e->getMessage()]);
@@ -732,13 +753,26 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
                     <tr><th>#</th><th>Candidate</th><th>Party</th><th>Symbol</th><th>Total Votes</th><th>Share %</th></tr>
                 </thead>
                 <tbody>
-                <?php foreach($candidate_totals as $idx => $c):
-                    $share = $total_votes_agg > 0 ? round($c['total_votes']/$total_votes_agg*100,1) : 0;
-                    $col   = pcolor($c['abbreviation']??'',$party_colors);
-                    $isTop = $idx === 0;
-                ?>
-                <tr class="<?= $isTop?'leader-row':'' ?>">
-                    <td><?= $isTop ? '🏆' : ($idx+1) ?></td>
+                <?php
+$top_votes_display = (int)($candidate_totals[0]['total_votes'] ?? 0);
+$is_display_tie = count(array_filter($candidate_totals,
+    fn($x) => (int)$x['total_votes'] === $top_votes_display && $top_votes_display > 0)) > 1;
+
+foreach($candidate_totals as $idx => $c):
+    $share = $total_votes_agg > 0 ? round($c['total_votes']/$total_votes_agg*100,1) : 0;
+    $col   = pcolor($c['abbreviation']??'',$party_colors);
+    $isTop = (int)$c['total_votes'] === $top_votes_display && $top_votes_display > 0;
+?>
+<tr class="<?= ($isTop && !$is_display_tie) ? 'leader-row' : '' ?>">
+    <td>
+        <?php if($is_display_tie && $isTop): ?>
+            <span title="Tied">🤝</span>
+        <?php elseif(!$is_display_tie && $isTop): ?>
+            🏆
+        <?php else: ?>
+            <?= $idx+1 ?>
+        <?php endif; ?>
+    </td>
                     <td><strong><?= htmlspecialchars($c['full_name']) ?></strong></td>
                     <td><span class="party-chip" style="background:<?= $col ?>;"><?= htmlspecialchars($c['party_name']??'IND') ?></span></td>
                     <td style="color:var(--muted);"><?= htmlspecialchars($c['symbol']??'—') ?></td>
@@ -861,7 +895,10 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
                 <div class="mon-card"><div class="mon-val sv-blue"><?= number_format($total_votes_agg) ?></div><div class="mon-label">Total Votes</div></div>
                 <div class="mon-card"><div class="mon-val sv-amber"><?= $pending_stations ?></div><div class="mon-label">Pending</div></div>
             </div>
-            <?php if($leading): ?>
+            <?php 
+             if($is_display_tie && $top_votes_display > 0): ?>
+             <span style="font-size:12px;font-weight:600;color:var(--warning);">⚠️ Tie detected — RO adjudication required</span>
+            <?php elseif($leading && $top_votes_display > 0): ?>
             <div style="margin-top:14px;background:#f0fdfa;border:1px solid #99f6e4;border-radius:8px;padding:12px;">
                 <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Leading Candidate</div>
                 <div style="font-weight:700;font-size:14px;"><?= htmlspecialchars($leading['full_name']) ?></div>

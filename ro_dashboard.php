@@ -52,6 +52,12 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && ($_POST['action']??'')==='approve_pub
         exit;
     }
 
+    if ((int)($cr['is_tie'] ?? 0) === 1 && empty($cr['winner_candidate_id'])) {
+    echo json_encode(['success'=>false,
+        'message'=>'⚠️ This result has a TIE. You must manually select the winner before approving. Contact the Election Commission for adjudication guidelines.']);
+    exit;
+}
+
     $pdo->beginTransaction();
     try {
         // Update constituency_results
@@ -648,13 +654,20 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
     <!-- WINNER ANNOUNCEMENT -->
     <?php
     $winner = null;
-    foreach($active_candidates as $c){ if((int)$c['candidate_id']===(int)($active_con['winner_candidate_id']??0)){ $winner=$c; break; } }
+    
+    $winner   = null;
+$is_tie   = (int)($active_con['is_tie'] ?? 0) === 1;
+foreach($active_candidates as $c){
+    if((int)$c['candidate_id']===(int)($active_con['winner_candidate_id']??0)){
+        $winner=$c; break;
+    }
+}
     $total_v = array_sum(array_column($active_candidates,'total_votes'));
     $w_share = ($winner && $total_v>0) ? round($winner['total_votes']/$total_v*100,1) : 0;
-    $w_margin = (count($active_candidates)>=2 && $winner) ? $winner['total_votes'] - ($active_candidates[1]['total_votes']??0) : 0;
+   $w_margin = (!$is_tie && count($active_candidates)>=2 && $winner)? max(0, $winner['total_votes'] - ($active_candidates[1]['total_votes']??0)) : 0;
     $w_col    = pcol($winner['abbreviation']??'',$pcolors);
     ?>
-    <?php if($is_approved && $winner): ?>
+    <?php if($is_approved && $winner && !$is_tie): ?>
     <div class="winner-card section-gap">
         <div style="position:relative;z-index:1;">
             <div class="winner-badge">🏆 OFFICIAL WINNER — DECLARED</div>
@@ -671,6 +684,19 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
             <div class="winner-con">📍 <?= htmlspecialchars($active_con['name']) ?> — <?= htmlspecialchars($active_con['code']??'') ?> · Approved <?= $active_con['approval_timestamp'] ? date('d M Y',strtotime($active_con['approval_timestamp'])) : date('d M Y') ?></div>
         </div>
     </div>
+    <?php elseif($is_tie): ?>
+<div style="background:#fffbeb;border:2px solid #fcd34d;border-radius:12px;padding:24px 28px;margin-bottom:20px;">
+    <div style="font-size:28px;margin-bottom:10px;">⚠️</div>
+    <div style="font-size:17px;font-weight:800;color:#92400e;margin-bottom:8px;">Tied Result — Adjudication Required</div>
+    <div style="font-size:13px;color:#78350f;line-height:1.7;">
+        Two or more candidates received an equal number of votes. Under Electoral Rule ECR-10,
+        a tied result cannot be automatically declared. The Returning Officer must resolve this
+        tie in accordance with Election Commission guidelines before this result can be approved and published.
+    </div>
+    <div style="margin-top:14px;font-size:12px;color:#92400e;font-weight:600;">
+        Tied candidates are highlighted below with 🤝. Contact your Assistant Returning Officer and the ARO's compiled report for verification.
+    </div>
+</div>
     <?php else: ?>
     <div class="winner-locked section-gap">
         <span class="lock-icon">🔒</span>
@@ -705,10 +731,17 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
             <?php foreach($active_candidates as $idx=>$c):
                 $share = $total_v>0 ? round($c['total_votes']/$total_v*100,1) : 0;
                 $col   = pcol($c['abbreviation']??'',$pcolors);
-                $isWin = ($winner && (int)$c['candidate_id']===(int)$winner['candidate_id']);
+                $top_votes_ro = (int)($active_candidates[0]['total_votes'] ?? 0);
+$is_ro_tie    = (int)($active_con['is_tie'] ?? 0) === 1;
+$isWin        = (!$is_ro_tie && $winner && (int)$c['candidate_id']===(int)($winner['candidate_id']??0));
+$isTied       = ($is_ro_tie && (int)$c['total_votes'] === $top_votes_ro && $top_votes_ro > 0);
             ?>
             <tr class="<?= $isWin?'winner-row':'' ?>">
-                <td style="color:var(--muted);font-weight:600;"><?= $isWin?'🏆':($idx+1) ?></td>
+                <td style="color:var(--muted);font-weight:600;">
+    <?php if($isTied): ?>🤝
+    <?php elseif($isWin): ?>🏆
+    <?php else: ?><?= $idx+1 ?><?php endif; ?>
+</td>
                 <td>
                     <div style="font-weight:700;font-size:13.5px;"><?= htmlspecialchars($c['full_name']) ?></div>
                 </td>
@@ -725,7 +758,13 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
                         <span style="font-size:12px;font-weight:600;width:38px;text-align:right;"><?= $share ?>%</span>
                     </div>
                 </td>
-                <td><?= $isWin ? '<span class="badge badge-winner">🏆 Winner</span>' : '<span style="font-size:12px;color:var(--muted);">Candidate</span>' ?></td>
+                <?php if($isTied): ?>
+    <span class="badge" style="background:#fef9c3;color:#92400e;border:1px solid #fde68a;">⚠️ Tied</span>
+<?php elseif($isWin): ?>
+    <span class="badge badge-winner">🏆 Winner</span>
+<?php else: ?>
+    <span class="badge badge-pending">Defeated</span>
+<?php endif; ?>
             </tr>
             <?php endforeach; ?>
             </tbody>
